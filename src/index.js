@@ -1,15 +1,27 @@
-import Service from "./service.js";
+import Task from "./task.js";
 
-const data = {
-    username: `erickwendel-${Date.now()}`,
-    password: 'minhasenhasecreta',
-}
+const oneSecond = 1000
+const runInASec = new Date(Date.now() + oneSecond)
+const runInTwoSecs = new Date(Date.now() + oneSecond * 2)
+const runInThreeSecs = new Date(Date.now() + oneSecond * 3)
 
-const service = new Service({
-    filename: './users.ndjson'
+const task = new Task()
+task.save({
+    name: 'task1',
+    dueAt: runInASec,
+    fn: () => console.log('task1 executed')
 })
 
-await service.create(data)
+task.save({
+    name: 'task2',
+    dueAt: runInTwoSecs,
+    fn: () => console.log('task2 executed')
+})
 
-const users = await service.read()
-console.log('users', users);
+task.save({
+    name: 'task3',
+    dueAt: runInThreeSecs,
+    fn: () => console.log('task3 executed')
+})
+
+task.run(runInASec)
