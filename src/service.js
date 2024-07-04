@@ -11,10 +11,9 @@ export default class Service {
     }
 
     #hashPassword(password) {
-        const hash = crypto.createHash('sha256')
-        hash.update(password)
-
-        return hash.digest('hex')
+        return crypto.createHash('sha256')
+            .update(password)
+            .digest('hex')
     }
 
     create({ username, password}) {
@@ -29,7 +28,7 @@ export default class Service {
 
     async read() {
         if(!fsSync.existsSync(this.#filename)) {
-            return new Error('Arquivo não existe.')
+            return []
         } 
 
         const lines = (await fs.readFile(this.#filename, 'utf-8'))
