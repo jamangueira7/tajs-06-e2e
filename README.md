@@ -6,7 +6,7 @@
 </p>
 <br>
 
-# TAJS - Setup Jest
+# TAJS - Stubs e Spy
 
 ## 🚀 Tecnologias
 
@@ -23,6 +23,10 @@ Esse projeto foi desenvolvido com as seguintes tecnologias:
 - [x] - Possui debug com VSCode
 - [x] - Possui suporte para debug com navegadores
 
+### Testes
+
+![img.png](.github%2Fimgage.png)
+
 
 ## 🚀 Como Rodar
 
@@ -38,7 +42,7 @@ cd tajs-erickwendel
 e então Restaure os pacotes:
 
 ```shell
-cd aula01-setup-jest
+cd aula03-stubs
 npm ci --silent
 ```
 
