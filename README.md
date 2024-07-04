@@ -25,7 +25,7 @@ Esse projeto foi desenvolvido com as seguintes tecnologias:
 
 ### Testes
 
-![img.png](.github%2Fimgage.png)
+![image.png](.github%2Fimage.png)s
 
 
 ## 🚀 Como Rodar
