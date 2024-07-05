@@ -6,7 +6,7 @@
 </p>
 <br>
 
-# TAJS - Stubs e Spy
+# TAJS - Faketimes
 
 ## 🚀 Tecnologias
 
@@ -42,7 +42,7 @@ cd tajs-erickwendel
 e então Restaure os pacotes:
 
 ```shell
-cd aula03-stubs
+cd aula04-faketimes
 npm ci --silent
 ```
 
@@ -55,6 +55,10 @@ npm run test:dev
 ou apenas executá-los
 ```shell
 npm run test
+```
+ou apenas executá-los
+```shell
+npm run strat
 ```
 
 ### Depuração e Live reload no VSCode
