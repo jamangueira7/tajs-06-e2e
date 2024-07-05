@@ -1,27 +1,13 @@
-import Task from "./task.js";
+import server from "./server.js"
 
-const oneSecond = 1000
-const runInASec = new Date(Date.now() + oneSecond)
-const runInTwoSecs = new Date(Date.now() + oneSecond * 2)
-const runInThreeSecs = new Date(Date.now() + oneSecond * 3)
+if (process.env.NODE_ENV !== 'test') {
+    server.listen(process.env.PORT, () => {
+        const serverInfo = server.address()
+        console.log(`server is runnig at ${serverInfo.address}:${serverInfo.port}`)
+    })
+}
 
-const task = new Task()
-task.save({
-    name: 'task1',
-    dueAt: runInASec,
-    fn: () => console.log('task1 executed')
-})
-
-task.save({
-    name: 'task2',
-    dueAt: runInTwoSecs,
-    fn: () => console.log('task2 executed')
-})
-
-task.save({
-    name: 'task3',
-    dueAt: runInThreeSecs,
-    fn: () => console.log('task3 executed')
-})
-
-task.run(runInASec)
+export default server
+/*
+    curl -i -X POST -H 'Content-Type: application/json' -d '{"name": "joao mangueira","cpf": "123.456.789-00"}' http://localhost:3000/persons
+*/
