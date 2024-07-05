@@ -6,7 +6,7 @@
 </p>
 <br>
 
-# TAJS - Faketimes
+# TAJS - Coverages
 
 ## 🚀 Tecnologias
 

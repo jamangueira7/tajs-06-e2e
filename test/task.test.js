@@ -75,6 +75,11 @@ describe('Service Test Suite', () => {
             jest.advanceTimersByTime(4000)
             //a segunda tarefa deve ser executado
             expect(tasks.at(1).fn).toHaveBeenCalled()
+
+            jest.advanceTimersByTime(4000)
+            //a segunda tarefa deve ser executado
+            expect(console.log).toHaveBeenCalledWith('tasks finished')
+            
         })
 
     })

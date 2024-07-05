@@ -7,5 +7,6 @@ const config = {
   learMocks: true,
 
   overageProvider: "v8",
+  collectCoverage: true,
 }
 export default config;
