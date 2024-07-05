@@ -1,128 +1,80 @@
 import { describe, it, expect, beforeEach, jest } from '@jest/globals'
-import crypto from 'node:crypto'
-import fsSync from 'node:fs'
-import fs from 'node:fs/promises'
-import Service from '../src/service.js'
+import Task from '../src/task.js'
+import { setTimeout } from 'node:timers/promises'
 
 describe('Service Test Suite', () => {
-    let _service
-    const filename = 'testfile.ndjson'
-    const MOCKED_HASH_PWD = 'senhaencriptada'
+    let _logMock = 'testfile.ndjson'
+    let _task = 'testfile.ndjson'
     beforeEach(() => {
-        _service = new Service({filename})
+        _task = new Task()
+        jest.spyOn(
+            console,
+            console.log.name
+        ).mockImplementation()
     })
 
     describe('#read', () => {
         
-        it('#should return an empty array if the file is not exist', async () => {
-            jest.spyOn(
-                fsSync,
-                'existsSync'
-            ).mockReturnValue(false)
-
-            const result = await _service.read()
-            expect(result).toEqual([])
-        })
-
-        
-        it('#should return an empty array if the file is empty', async () => {
-            jest.spyOn(
-                fsSync,
-                "existsSync"
-            ).mockReturnValue(true)
-
-            jest.spyOn(
-                fs,
-                "readFile"
-            ).mockResolvedValue('')
-
-            const result = await _service.read()
-            expect(result).toEqual([])
-        })
-
-        it('#should return users without password if file contains users', async () => {
-            const dbData = [
+        it.skip('#should only run task that are due without fake times(slow)', async () => {
+            const tasks = [
                 {
-                    username:'user1',
-                    password:'pass1',
-                    createdAt: new Date().toISOString()
+                    name: 'Task-Will-Run-In-5-Secs',
+                    dueAt: new Date(Date.now() + 5000),
+                    fn: jest.fn()
                 },
                 {
-                    username:'user2',
-                    password:'pass2',
-                    createdAt: new Date().toISOString()
+                    name: 'Task-Will-Run-In-10-Secs',
+                    dueAt: new Date(Date.now() + 10000),
+                    fn: jest.fn()
                 }
             ]
 
-            const fileContents = dbData
-                .map(item => JSON.stringify(item).concat('\n'))
-                .join('')
+            _task.save(tasks.at(0))
+            _task.save(tasks.at(1))
 
-            jest.spyOn(
-                fsSync,
-                "existsSync"
-            ).mockReturnValue(true)
+            _task.run(200)
 
-            jest.spyOn(
-                fs,
-                "readFile"
-            ).mockResolvedValue(fileContents)
+            await setTimeout(11000) //11_000
 
-            const result = await _service.read()
-            const expected = dbData .map(({ password, ...rest }) => ({ ...rest }))
-            expect(result).toEqual(expected)
-        })
-    })
+            expect(tasks.at(0).fn).toHaveBeenCalled()
+            expect(tasks.at(1).fn).toHaveBeenCalled()
+        }, 15000)
 
-    describe('#create - spies', () => {
-        beforeEach(() => {
-            _service = new Service({filename})
-            jest.spyOn(
-                crypto,
-                crypto.createHash.name
-            ).mockReturnValue({
-                update: jest.fn().mockReturnThis(),
-                digest: jest.fn().mockReturnValue(MOCKED_HASH_PWD)
-            })
+        it('#should only run task that are due with fake times(fast)', async () => {
+            jest.useFakeTimers()
 
-            jest.spyOn(
-                fs,
-                fs.appendFile.name
-            ).mockResolvedValue()
-        })
+            const tasks = [
+                {
+                    name: 'Task-Will-Run-In-5-Secs',
+                    dueAt: new Date(Date.now() + 5000),
+                    fn: jest.fn()
+                },
+                {
+                    name: 'Task-Will-Run-In-10-Secs',
+                    dueAt: new Date(Date.now() + 10000),
+                    fn: jest.fn()
+                }
+            ]
 
-        it('#should call appendFile with right params', async () => {
-            const expectedCreateAt = new Date().toDateString()
+            _task.save(tasks.at(0))
+            _task.save(tasks.at(1))
 
-            const input = {
-                username:'user1',
-                password:'pass1',
-            }
+            _task.run(200)
 
-            jest.spyOn(
-                Date.prototype,
-                Date.prototype.toISOString.name
-            ).mockReturnValue(expectedCreateAt)
+            jest.advanceTimersByTime(4000)
 
-            await _service.create(input)
-            expect(crypto.createHash).toHaveBeenCalledTimes(1)
-            expect(crypto.createHash).toHaveBeenCalledWith('sha256')
+            //ninguem deve ser executado ainda
+            expect(tasks.at(0).fn).not.toHaveBeenCalled()
+            expect(tasks.at(1).fn).not.toHaveBeenCalled()
 
-            const hash = crypto.createHash('sha256')
-            expect(hash.update).toHaveBeenCalledWith(input.password)
-            expect(hash.digest).toHaveBeenCalledWith('hex')
+            jest.advanceTimersByTime(2000)
+            //so a primeira deve ser chamada
+            expect(tasks.at(0).fn).toHaveBeenCalled()
+            expect(tasks.at(1).fn).not.toHaveBeenCalled()
 
-            const expected = JSON.stringify({
-                ...input,
-                createdAt: expectedCreateAt,
-                password: MOCKED_HASH_PWD
-
-            }).concat('\n')
-
-            expect(fs.appendFile).toHaveBeenCalledWith(
-                filename,
-                expected
-            )
+            jest.advanceTimersByTime(4000)
+            //a segunda tarefa deve ser executado
+            expect(tasks.at(1).fn).toHaveBeenCalled()
         })
 
     })
