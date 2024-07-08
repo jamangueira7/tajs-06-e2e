@@ -1,4 +1,5 @@
 import { describe, it, expect, beforeAll, afterAll, jest } from '@jest/globals'
+import fs from 'node:fs/promises'
 
 function waitForServerStatus(server) {
     return new Promise((resolve, reject) => {
@@ -78,6 +79,49 @@ describe('E2E Teste Suite', () => {
             const data = await response.json()
             expect(data.validationError).toEqual('cpf is required')
         })
+
+        it('should saved person', async () => {
+            const validPerson = { 
+                name: 'Fulano da Silva',
+                cpf: '123.456.789-00',
+            }
+            const response = await fetch(`${_testServerAddress}/persons`, {
+                method: 'POST',
+                body: JSON.stringify(validPerson)
+            })
+
+            expect(response.status).toBe(200)
+            const data = await response.json()
+            expect(data).toEqual({"result": "ok"})
+        })
+
+        it('should return 500', async () => {
+            const validPerson = { 
+                name: 'Xuxa da Silva',
+                cpf: '123.456.789-00',
+            }
+            
+            jest.spyOn(
+                fs,
+                'appendFile'
+            ).mockImplementation(Promise.resolve(new Error('Async error message')));
+
+            jest.spyOn(
+                console,
+                console.error.name
+            )
+
+            const response = await fetch(`${_testServerAddress}/persons`, {
+                method: 'POST',
+                body: JSON.stringify(validPerson)
+            })
+
+            expect(response.status).toBe(500)
+            expect(console.error).toHaveBeenCalledWith(
+                `deu ruim`
+            )
+        })
+
     })    
 })
 

@@ -15,6 +15,7 @@ const server = createServer(async (request, response) => {
   
         return response.end(JSON.stringify({ result }));
     } catch (error) {
+        
         if (error.message.includes('required')) {
             response.writeHead(400)
             response.write(
@@ -25,9 +26,11 @@ const server = createServer(async (request, response) => {
             response.end()
             return;
         }
-        console.error('deu ruim', error)
+
+        console.error('deu ruim')
         response.writeHead(500)
         response.end()
+        return;
     }
 })
 

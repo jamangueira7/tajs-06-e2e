@@ -1,8 +1,11 @@
+import fs from 'node:fs/promises'
+
 class Person {
     static validate(person) {
         if(!person.name) throw new Error('name is required')
         if(!person.cpf) throw new Error('cpf is required')
     }
+
     static format(person) {
         const [name, ...lastName] = person.name.split(' ')
         return {
@@ -11,12 +14,15 @@ class Person {
             lastName: lastName.join(' ')
         }
     }
+
     static save(person) {
         if(!['cpf', 'name', 'lastName'].every(prop => person[prop])) {
             throw new Error(`cannot save invalid person: ${JSON.stringify(person)}`)
         }
 
         // .. banco de dados, api, etc
+        const data = JSON.stringify(person).concat('\n')
+        fs.appendFile('./persons.ndjson', data)
 
         console.log('registrado com sucesso!!', person)
     }
